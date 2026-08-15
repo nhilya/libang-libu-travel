@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { Faq } from "@/components/faq";
 
 const modules = [
@@ -51,11 +52,7 @@ export default function Home() {
       <header className="site-header">
         <div className="container nav-wrap">
           <a className="brand" href="#top">
-            <span className="brand-mark">LL</span>
-            <span>
-              <strong>Libang Libu Travel</strong>
-              <small>Ipoh School Outing</small>
-            </span>
+            <BrandLogo priority />
           </a>
           <nav aria-label="Main navigation">
             <a href="#expeditions">Expeditions</a>
@@ -71,8 +68,7 @@ export default function Home() {
         <section id="top" className="section hero">
           <div className="container hero-grid">
             <div>
-              <span className="eyebrow pill"><i />Educational Learning Expeditions</span>
-              <h1>Ipoh is our<br /><span>classroom.<i className="strata-line" /></span></h1>
+              <h1>Ipoh Learning<br /><span>Expedition.<i className="strata-line" /></span></h1>
               <p className="hero-copy">A structured, geology-led school expedition through Kinta Valley limestone, tin-mining history and living heritage — designed with teachers, run by licensed guides.</p>
               <div className="actions">
                 <Link className="button" href="/planner">Plan My School Trip</Link>
@@ -150,9 +146,10 @@ export default function Home() {
         <div className="container">
           <div className="footer-cta"><h2>Ipoh is our classroom. Bring your students into it.</h2><Link className="button button-light" href="/planner">Plan My School Trip</Link></div>
           <div className="footer-grid">
-            <div><span>Libang Libu Travel</span><p>Educational Learning Expeditions<br />Ipoh, Perak, Malaysia</p></div>
+            <div><BrandLogo className="footer-logo" /><p>Educational Learning Expeditions<br />Ipoh, Perak, Malaysia</p></div>
             <div><span>Contact</span><p>schools@libanglibu.travel<br />+60 5 000 0000</p></div>
             <div><span>Office hours</span><p>Mon–Fri, 9am–6pm MYT<br />Replies within 2 working days</p></div>
+            <div><span>Trip apps</span><p><Link href="/guide">Tour Guide PWA</Link><br /><Link href="/teacher">Teacher PWA</Link></p></div>
           </div>
           <p className="copyright">© 2026 Libang Libu Travel — Ipoh School Outing</p>
         </div>

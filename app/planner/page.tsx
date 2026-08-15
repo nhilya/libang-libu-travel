@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { TripPlanner } from "@/components/trip-planner";
 
 export const metadata: Metadata = {
@@ -13,11 +14,7 @@ export default function PlannerPage() {
       <header className="site-header">
         <div className="container nav-wrap">
           <Link className="brand" href="/">
-            <span className="brand-mark">LL</span>
-            <span>
-              <strong>Libang Libu Travel</strong>
-              <small>Ipoh School Outing</small>
-            </span>
+            <BrandLogo priority />
           </Link>
           <Link className="button button-outline button-small" href="/">Back to expeditions</Link>
         </div>
