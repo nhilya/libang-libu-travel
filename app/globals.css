@@ -88,7 +88,9 @@ figcaption { margin-top: 12px; color: var(--muted-foreground); }
 .steps h3 { margin-top: 16px; font-size: 20px; }
 .steps p { margin-top: 8px; font-size: 14px; line-height: 1.55; }
 
-.planner-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; }
+.planner-grid { display: grid; max-width: 900px; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+.planner-page main { min-height: calc(100vh - 64px); }
+.planner-intro { align-self: start; }
 .lead { margin-top: 20px; line-height: 1.55; }
 .price-card { margin-top: 40px; padding: 24px; }
 .price-card > span { color: var(--muted-foreground); }
@@ -96,10 +98,14 @@ figcaption { margin-top: 12px; color: var(--muted-foreground); }
 .price-card p small { margin-left: 8px; color: var(--muted-foreground); font: 400 16px "DM Sans", sans-serif; }
 .price-card em { display: block; margin-top: 12px; color: var(--muted-foreground); font-family: "DM Sans", sans-serif; font-style: normal; letter-spacing: 0; text-transform: none; }
 .planner-card { min-height: 396px; padding: 28px; }
+.brief-note { margin-top: 24px; padding: 16px 18px; border-left: 2px solid var(--accent); background: color-mix(in oklab, var(--secondary) 55%, transparent); }
+.brief-note span { font: 600 12px "Space Grotesk", sans-serif; }
+.brief-note p { margin-top: 4px; color: var(--muted-foreground); font-size: 13px; line-height: 1.5; }
 .progress { display: flex; align-items: center; gap: 8px; }
 .progress i { height: 4px; flex: 1; border-radius: 999px; background: var(--border); }
 .progress i.active { background: var(--primary); }
 .progress span { margin-left: 12px; color: var(--muted-foreground); white-space: nowrap; }
+.step-title { margin-top: 20px; font: 600 24px "Space Grotesk", sans-serif; letter-spacing: -0.03em; }
 .form-step { display: grid; gap: 24px; margin-top: 28px; }
 .field { display: grid; gap: 12px; }
 .field > span { color: var(--muted-foreground); }
@@ -113,6 +119,8 @@ figcaption { margin-top: 12px; color: var(--muted-foreground); }
 .module-options button.selected { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 5%, transparent); }
 .module-options small { display: block; color: var(--muted-foreground); font: 11px ui-monospace, monospace; letter-spacing: 0.1em; }
 .module-options span { display: block; margin-top: 4px; }
+.compact-options button { display: flex; min-height: 48px; align-items: center; }
+.compact-options button span { margin-top: 0; }
 .field input:not([type="range"]), .field textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 2px; outline: none; background: transparent; font-size: 14px; }
 .field textarea { min-height: 72px; resize: vertical; }
 .field input:focus, .field textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }

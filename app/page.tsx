@@ -1,6 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Faq } from "@/components/faq";
-import { TripPlanner } from "@/components/trip-planner";
 
 const modules = [
   {
@@ -63,7 +63,7 @@ export default function Home() {
             <a href="#safety">Safety</a>
             <a href="#faq">FAQ</a>
           </nav>
-          <a className="button button-small" href="#planner">Plan My School Trip</a>
+          <Link className="button button-small" href="/planner">Plan My School Trip</Link>
         </div>
       </header>
 
@@ -75,7 +75,7 @@ export default function Home() {
               <h1>Ipoh is our<br /><span>classroom.<i className="strata-line" /></span></h1>
               <p className="hero-copy">A structured, geology-led school expedition through Kinta Valley limestone, tin-mining history and living heritage — designed with teachers, run by licensed guides.</p>
               <div className="actions">
-                <a className="button" href="#planner">Plan My School Trip</a>
+                <Link className="button" href="/planner">Plan My School Trip</Link>
                 <a className="button button-outline" href="#expeditions">See learning modules</a>
               </div>
               <dl className="stats">
@@ -124,8 +124,6 @@ export default function Home() {
           </div>
         </section>
 
-        <TripPlanner />
-
         <section id="safety" className="section">
           <div className="container safety-grid">
             <div>
@@ -147,7 +145,7 @@ export default function Home() {
 
       <footer>
         <div className="container">
-          <div className="footer-cta"><h2>Ipoh is our classroom. Bring your students into it.</h2><a className="button button-light" href="#planner">Plan My School Trip</a></div>
+          <div className="footer-cta"><h2>Ipoh is our classroom. Bring your students into it.</h2><Link className="button button-light" href="/planner">Plan My School Trip</Link></div>
           <div className="footer-grid">
             <div><span>Libang Libu Travel</span><p>Educational Learning Expeditions<br />Ipoh, Perak, Malaysia</p></div>
             <div><span>Contact</span><p>schools@libanglibu.travel<br />+60 5 000 0000</p></div>
