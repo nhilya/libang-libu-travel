@@ -84,11 +84,14 @@ export default function Home() {
                 <div><dt>Curriculum aligned</dt><dd>4 states</dd></div>
               </dl>
             </div>
-            <figure>
-              <div className="image-frame">
-                <Image src="/hero-cave.jpg" alt="Students and a guide studying limestone formations inside an Ipoh cave" width={1600} height={1104} priority />
-              </div>
-              <figcaption>Fig. 01 — Kinta Valley karst chamber, field study session</figcaption>
+            <figure className="hero-art">
+              <Image
+                src="/hero.png"
+                alt="Ipoh students in front of Dewan Bandaran Ipoh"
+                width={3242}
+                height={2174}
+                priority
+              />
             </figure>
           </div>
         </section>
