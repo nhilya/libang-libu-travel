@@ -69,7 +69,7 @@ export default function Home() {
           <div className="container hero-grid">
             <div>
               <h1>Ipoh Learning<br /><span>Expedition.<i className="strata-line" /></span></h1>
-              <p className="hero-copy">A structured, geology-led school expedition through Kinta Valley limestone, tin-mining history and living heritage — designed with teachers, run by licensed guides.</p>
+              <p className="hero-copy">We create educational school trips that turn local (IPOH) destinations into classrooms through hands on History, Science and Culture experiences.</p>
               <div className="actions">
                 <Link className="button" href="/planner">Plan My School Trip</Link>
                 <a className="button button-outline" href="#expeditions">See learning modules</a>
