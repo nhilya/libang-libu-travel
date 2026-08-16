@@ -106,3 +106,17 @@ export type MonitoringReview = {
   decision: "APPROVED" | "REJECTED";
   notes?: string;
 };
+
+export type CommercialStatus = "AWAITING_CONFIRMATION" | "QUOTATION_ACCEPTED" | "AGREEMENT_SIGNED" | "DEPOSIT_PAID";
+
+export type CommercialProgress = {
+  proposalNumber: string;
+  status: CommercialStatus;
+  quotationTotal: number;
+  depositAmount: number;
+  acceptedAt?: string;
+  agreementSignedAt?: string;
+  signedBy?: string;
+  paidAt?: string;
+  paymentReference?: string;
+};

@@ -30,9 +30,11 @@ export function MonitoringChecklist({ tripId, role }: { tripId: string; role: Ex
     const initialLoad = window.setTimeout(() => void load(), 0);
     const refresh = () => void load();
     window.addEventListener("llt:demo-state", refresh);
+    window.addEventListener("storage", refresh);
     return () => {
       window.clearTimeout(initialLoad);
       window.removeEventListener("llt:demo-state", refresh);
+      window.removeEventListener("storage", refresh);
     };
   }, [load]);
 

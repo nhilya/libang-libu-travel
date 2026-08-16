@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const levels = ["Primary (Std 4-6)", "Lower Secondary", "Upper Secondary", "Pre-U / Matrikulasi"];
 const lengths = ["Day trip", "2D1N", "3D2N"] as const;
@@ -49,8 +49,8 @@ export function TripPlanner() {
       setError("Select at least one module and describe the main learning outcome.");
       return;
     }
-    if (step === 2 && (!origin.trim() || !dates.trim())) {
-      setError("Add the departure point and preferred date or school term.");
+    if (step === 2 && (!origin.trim() || !dates)) {
+      setError("Add the departure point and preferred departure date.");
       return;
     }
     setError("");
@@ -113,7 +113,7 @@ export function TripPlanner() {
                 <Field label="Trip length"><OptionGroup options={[...lengths]} value={length} onChange={(value) => setLength(value as (typeof lengths)[number])} /></Field>
                 <div className="two-fields">
                   <Field label="School location / departure point"><input value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="Shah Alam, Selangor" /></Field>
-                  <Field label="Preferred dates or school term"><input value={dates} onChange={(event) => setDates(event.target.value)} placeholder="12–13 March 2027" /></Field>
+                  <Field label="Preferred departure date"><DatePicker value={dates} onChange={setDates} /></Field>
                 </div>
                 <Field label="Transport arrangement"><OptionGroup options={["Include coach from school", "Meet in Ipoh", "Need advice"]} value={transport} onChange={setTransport} /></Field>
               </>}
@@ -159,4 +159,140 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function OptionGroup({ options, value, onChange }: { options: string[]; value: string; onChange: (value: string) => void }) {
   return <div className="option-group">{options.map((option) => <button type="button" className={option === value ? "selected" : ""} onClick={() => onChange(option)} key={option}>{option}</button>)}</div>;
+}
+
+function DatePicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const selectedDate = value ? fromDateValue(value) : null;
+  const [open, setOpen] = useState(false);
+  const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(selectedDate ?? new Date()));
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function closePicker(event: PointerEvent) {
+      if (!pickerRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("pointerdown", closePicker);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closePicker);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
+
+  const calendarDays = useMemo(() => buildCalendar(visibleMonth), [visibleMonth]);
+  const today = startOfDay(new Date());
+
+  function selectDate(date: Date) {
+    onChange(toDateValue(date));
+    setVisibleMonth(startOfMonth(date));
+    setOpen(false);
+  }
+
+  return (
+    <div className="date-picker" ref={pickerRef}>
+      <button
+        type="button"
+        className={`date-picker-trigger${open ? " open" : ""}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="date-picker-icon" aria-hidden="true">
+          <i /><i />
+        </span>
+        <span className={selectedDate ? "" : "date-picker-placeholder"}>
+          {selectedDate ? formatSelectedDate(selectedDate) : "Choose a date"}
+        </span>
+        <span className="date-picker-chevron" aria-hidden="true">⌄</span>
+      </button>
+
+      {open && (
+        <div className="date-picker-popover" role="dialog" aria-label="Choose preferred departure date">
+          <div className="date-picker-header">
+            <button type="button" aria-label="Previous month" onClick={() => setVisibleMonth(addMonths(visibleMonth, -1))}>‹</button>
+            <strong>{visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" })}</strong>
+            <button type="button" aria-label="Next month" onClick={() => setVisibleMonth(addMonths(visibleMonth, 1))}>›</button>
+          </div>
+          <div className="date-picker-weekdays" aria-hidden="true">
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}
+          </div>
+          <div className="date-picker-days">
+            {calendarDays.map((date) => {
+              const disabled = date < today;
+              const outsideMonth = date.getMonth() !== visibleMonth.getMonth();
+              const selected = selectedDate ? sameDay(date, selectedDate) : false;
+              const isToday = sameDay(date, today);
+              return (
+                <button
+                  type="button"
+                  key={toDateValue(date)}
+                  disabled={disabled}
+                  className={`${outsideMonth ? "outside" : ""}${selected ? " selected" : ""}${isToday ? " today" : ""}`}
+                  aria-label={date.toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" })}
+                  aria-pressed={selected}
+                  onClick={() => selectDate(date)}
+                >
+                  {date.getDate()}
+                </button>
+              );
+            })}
+          </div>
+          <div className="date-picker-footer">
+            <span>Future dates only</span>
+            <button type="button" onClick={() => selectDate(today)}>Select today</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addMonths(date: Date, amount: number) {
+  return new Date(date.getFullYear(), date.getMonth() + amount, 1);
+}
+
+function buildCalendar(month: Date) {
+  const firstDay = startOfMonth(month);
+  const calendarStart = new Date(firstDay);
+  calendarStart.setDate(firstDay.getDate() - firstDay.getDay());
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(calendarStart);
+    date.setDate(calendarStart.getDate() + index);
+    return date;
+  });
+}
+
+function sameDay(first: Date, second: Date) {
+  return first.getFullYear() === second.getFullYear()
+    && first.getMonth() === second.getMonth()
+    && first.getDate() === second.getDate();
+}
+
+function toDateValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function fromDateValue(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatSelectedDate(date: Date) {
+  return date.toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
 }

@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OperationsHeader } from "@/components/operations-header";
+import { DemoBanner } from "@/components/demo-banner";
 import { operationsApi, operationsDemoMode } from "@/lib/operations-api";
 import { formatDateTime, locationAge } from "@/lib/operations-format";
-import type { LiveStatus, MonitoringCategory, MonitoringItem, MonitoringStage, Trip } from "@/lib/operations-types";
+import type { CommercialProgress, LiveStatus, MonitoringCategory, MonitoringItem, MonitoringStage, Trip } from "@/lib/operations-types";
 
 const categories: MonitoringCategory[] = ["BUS", "DRIVER", "TOUR_GUIDE", "FOOD"];
 const stages: MonitoringStage[] = ["PRE_TOUR", "DURING_TOUR", "AFTER_TOUR"];
@@ -12,6 +14,7 @@ const stages: MonitoringStage[] = ["PRE_TOUR", "DURING_TOUR", "AFTER_TOUR"];
 export function AdminMonitoringDashboard() {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus | null>(null);
+  const [commercial, setCommercial] = useState<CommercialProgress | null>(null);
   const [items, setItems] = useState<MonitoringItem[]>([]);
   const [stage, setStage] = useState<MonitoringStage>("PRE_TOUR");
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -25,12 +28,14 @@ export function AdminMonitoringDashboard() {
       const current = trips[0] || null;
       setTrip(current);
       if (current) {
-        const [monitoring, status] = await Promise.all([
+        const [monitoring, status, commercialProgress] = await Promise.all([
           operationsApi.getMonitoring(current.id),
           operationsApi.getLiveStatus(current.id),
+          operationsApi.getCommercialProgress(),
         ]);
         setItems(monitoring);
         setLiveStatus(status);
+        setCommercial(commercialProgress);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to load operations monitoring.");
@@ -44,10 +49,12 @@ export function AdminMonitoringDashboard() {
     const polling = window.setInterval(() => void load(), 20_000);
     const demoRefresh = () => void load();
     window.addEventListener("llt:demo-state", demoRefresh);
+    window.addEventListener("storage", demoRefresh);
     return () => {
       window.clearTimeout(initialLoad);
       window.clearInterval(polling);
       window.removeEventListener("llt:demo-state", demoRefresh);
+      window.removeEventListener("storage", demoRefresh);
     };
   }, [load]);
 
@@ -116,11 +123,11 @@ export function AdminMonitoringDashboard() {
     <div className="operations-app admin-app">
       <OperationsHeader active="admin" />
       <main className="operations-main admin-monitoring-main">
-        {operationsDemoMode && <div className="demo-banner">Admin monitoring prototype · Connect the monolith URL for production data and RBAC</div>}
+        {operationsDemoMode && <DemoBanner>Admin monitoring prototype · Changes sync with Guide and Teacher tabs</DemoBanner>}
         {loading ? <div className="operations-card operations-message">Loading monitoring dashboard…</div> : !trip ? <div className="operations-card operations-message"><h2>No active trip</h2></div> : <>
           <section className="operations-welcome admin-welcome">
             <div><span className="eyebrow accent">Operations control</span><h1>Trip monitoring</h1><p>{trip.title} · {trip.schoolName} · {formatDateTime(trip.scheduledStartAt)}</p></div>
-            <span className={`status-badge status-${trip.status.toLowerCase()}`}>{trip.status.replace("_", " ")}</span>
+            <div className="admin-heading-actions"><span className={`status-badge status-${trip.status.toLowerCase()}`}>{trip.status.replace("_", " ")}</span><Link className="button button-small" href="/admin/reports">Generate report</Link></div>
           </section>
 
           {error && <div className="operations-alert" role="alert">{error}</div>}
@@ -132,6 +139,16 @@ export function AdminMonitoringDashboard() {
             <article className="operations-card summary-stat stat-pending"><span>Pending</span><strong>{totals.pending}</strong></article>
             <article className="operations-card summary-stat stat-rejected"><span>Rejected</span><strong>{totals.rejected}</strong></article>
           </section>
+
+          {commercial && <section className={`operations-card admin-commercial admin-commercial-${commercial.status.toLowerCase()}`}>
+            <div><span className="eyebrow accent">Client confirmation & payment</span><h2>{commercialLabel(commercial.status)}</h2><p>Proposal {commercial.proposalNumber} · Total {formatMoney(commercial.quotationTotal)}</p></div>
+            <div className="admin-commercial-facts">
+              <span><small>Quotation</small><strong>{commercial.acceptedAt ? "Accepted ✓" : "Waiting"}</strong></span>
+              <span><small>Agreement</small><strong>{commercial.agreementSignedAt ? `Signed by ${commercial.signedBy}` : "Pending"}</strong></span>
+              <span><small>Deposit</small><strong>{commercial.paidAt ? `${formatMoney(commercial.depositAmount)} paid` : `${formatMoney(commercial.depositAmount)} due`}</strong></span>
+            </div>
+            <a href="/client/proposal">Open client view</a>
+          </section>}
 
           <section className="operations-card admin-live-strip">
             <div><span className={`gps-dot ${liveStatus?.trackingState === "LIVE" ? "live" : ""}`} /><div><strong>{trip.guide.name}</strong><small>{liveStatus?.trackingState.replace("_", " ") || "NOT STARTED"}</small></div></div>
@@ -182,4 +199,17 @@ export function AdminMonitoringDashboard() {
       </main>
     </div>
   );
+}
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR", maximumFractionDigits: 0 }).format(value);
+}
+
+function commercialLabel(status: CommercialProgress["status"]) {
+  return {
+    AWAITING_CONFIRMATION: "Waiting for client confirmation",
+    QUOTATION_ACCEPTED: "Quotation accepted",
+    AGREEMENT_SIGNED: "Agreement signed · Deposit pending",
+    DEPOSIT_PAID: "Deposit paid · Booking unlocked",
+  }[status];
 }

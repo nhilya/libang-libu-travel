@@ -1,4 +1,4 @@
-import type { DutyResult, LiveStatus, LocationPoint, MonitoringItem, MonitoringReview, MonitoringUpdate, OperationsRole, StopAction, Trip } from "@/lib/operations-types";
+import type { CommercialProgress, DutyResult, LiveStatus, LocationPoint, MonitoringItem, MonitoringReview, MonitoringUpdate, OperationsRole, StopAction, Trip } from "@/lib/operations-types";
 
 const STORAGE_KEY = "llt.operations.demo.v1";
 
@@ -6,7 +6,17 @@ type DemoState = {
   trip: Trip;
   liveStatus: LiveStatus;
   monitoring: MonitoringItem[];
+  commercial: CommercialProgress;
 };
+
+function initialCommercial(): CommercialProgress {
+  return {
+    proposalNumber: "LLT-2026-0184",
+    status: "AWAITING_CONFIRMATION",
+    quotationTotal: 19_600,
+    depositAmount: 5_880,
+  };
+}
 
 function isoAt(offsetDays: number, hours: number, minutes: number) {
   const date = new Date();
@@ -76,6 +86,7 @@ function initialState(): DemoState {
       nextStop: trip.itinerary[0],
     },
     monitoring: monitoringItems(trip.id),
+    commercial: initialCommercial(),
   };
 }
 
@@ -120,6 +131,7 @@ function readState(): DemoState {
   try {
     const parsed = JSON.parse(stored) as DemoState;
     if (!parsed.monitoring) parsed.monitoring = monitoringItems(parsed.trip.id);
+    if (!parsed.commercial) parsed.commercial = initialCommercial();
     return parsed;
   } catch {
     return initialState();
@@ -131,11 +143,50 @@ function writeState(state: DemoState) {
   window.dispatchEvent(new CustomEvent("llt:demo-state"));
 }
 
+function resetState() {
+  window.localStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new CustomEvent("llt:demo-state"));
+}
+
 function nextPendingStop(trip: Trip) {
   return trip.itinerary.find((stop) => stop.status !== "COMPLETED");
 }
 
 export const demoOperations = {
+  reset: resetState,
+
+  async getCommercialProgress(): Promise<CommercialProgress> {
+    return readState().commercial;
+  },
+
+  async acceptQuotation(): Promise<CommercialProgress> {
+    const state = readState();
+    state.commercial.status = "QUOTATION_ACCEPTED";
+    state.commercial.acceptedAt = new Date().toISOString();
+    writeState(state);
+    return state.commercial;
+  },
+
+  async signAgreement(signedBy: string): Promise<CommercialProgress> {
+    const state = readState();
+    if (state.commercial.status === "AWAITING_CONFIRMATION") throw new Error("Confirm the quotation first.");
+    state.commercial.status = "AGREEMENT_SIGNED";
+    state.commercial.signedBy = signedBy;
+    state.commercial.agreementSignedAt = new Date().toISOString();
+    writeState(state);
+    return state.commercial;
+  },
+
+  async payDeposit(): Promise<CommercialProgress> {
+    const state = readState();
+    if (state.commercial.status !== "AGREEMENT_SIGNED") throw new Error("Sign the agreement before payment.");
+    state.commercial.status = "DEPOSIT_PAID";
+    state.commercial.paidAt = new Date().toISOString();
+    state.commercial.paymentReference = `DEMO-${Date.now().toString().slice(-8)}`;
+    writeState(state);
+    return state.commercial;
+  },
+
   async getTrips(role: OperationsRole): Promise<Trip[]> {
     void role;
     return [readState().trip];

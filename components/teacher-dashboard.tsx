@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { OperationsHeader } from "@/components/operations-header";
 import { MonitoringChecklist } from "@/components/monitoring-checklist";
+import { DemoBanner } from "@/components/demo-banner";
 import { operationsApi, operationsDemoMode } from "@/lib/operations-api";
 import { formatDateTime, formatTime, locationAge } from "@/lib/operations-format";
 import type { LiveStatus, Trip } from "@/lib/operations-types";
@@ -34,11 +35,13 @@ export function TeacherDashboard() {
     const clock = window.setInterval(() => refreshClock((value) => value + 1), 10_000);
     const demoRefresh = () => void loadTrip();
     window.addEventListener("llt:demo-state", demoRefresh);
+    window.addEventListener("storage", demoRefresh);
     return () => {
       window.clearTimeout(initialLoad);
       window.clearInterval(polling);
       window.clearInterval(clock);
       window.removeEventListener("llt:demo-state", demoRefresh);
+      window.removeEventListener("storage", demoRefresh);
     };
   }, [loadTrip]);
 
@@ -61,7 +64,7 @@ export function TeacherDashboard() {
     <div className="operations-app teacher-app">
       <OperationsHeader active="teacher" />
       <main className="operations-main">
-        {operationsDemoMode && <div className="demo-banner">Demo data · Guide updates in this browser appear here automatically</div>}
+        {operationsDemoMode && <DemoBanner>Demo data · Guide updates from another tab appear here automatically</DemoBanner>}
         {loading ? <div className="operations-card operations-message">Loading school trip…</div> : !trip ? <div className="operations-card operations-message"><h2>No upcoming trip</h2></div> : <>
           <section className="operations-welcome">
             <div>

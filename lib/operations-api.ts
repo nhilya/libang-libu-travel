@@ -1,5 +1,5 @@
 import { demoOperations } from "@/lib/demo-operations";
-import type { DutyResult, LiveStatus, LocationPoint, MonitoringItem, MonitoringReview, MonitoringUpdate, OperationsRole, StopAction, Trip } from "@/lib/operations-types";
+import type { CommercialProgress, DutyResult, LiveStatus, LocationPoint, MonitoringItem, MonitoringReview, MonitoringUpdate, OperationsRole, StopAction, Trip } from "@/lib/operations-types";
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
 export const operationsDemoMode = !API_URL || API_URL.includes("api.example.com");
@@ -49,6 +49,40 @@ function idempotencyKey() {
 }
 
 export const operationsApi = {
+  resetDemo(): void {
+    if (operationsDemoMode) demoOperations.reset();
+  },
+
+  async getCommercialProgress(): Promise<CommercialProgress> {
+    if (operationsDemoMode) return demoOperations.getCommercialProgress();
+    return request("/proposals/LLT-2026-0184/commercial-progress");
+  },
+
+  async acceptQuotation(): Promise<CommercialProgress> {
+    if (operationsDemoMode) return demoOperations.acceptQuotation();
+    return request("/proposals/LLT-2026-0184/accept", {
+      method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey() },
+    });
+  },
+
+  async signAgreement(signedBy: string): Promise<CommercialProgress> {
+    if (operationsDemoMode) return demoOperations.signAgreement(signedBy);
+    return request("/proposals/LLT-2026-0184/agreement/sign", {
+      method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey() },
+      body: JSON.stringify({ signedBy }),
+    });
+  },
+
+  async payDeposit(): Promise<CommercialProgress> {
+    if (operationsDemoMode) return demoOperations.payDeposit();
+    return request("/proposals/LLT-2026-0184/payments/deposit", {
+      method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey() },
+    });
+  },
+
   async getTrips(role: OperationsRole): Promise<Trip[]> {
     if (operationsDemoMode) return demoOperations.getTrips(role);
     return request(`/trips?scope=mine&role=${role.toLowerCase()}`);

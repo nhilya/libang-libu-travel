@@ -149,7 +149,7 @@ export default function Home() {
             <div><BrandLogo className="footer-logo" /><p>Educational Learning Expeditions<br />Ipoh, Perak, Malaysia</p></div>
             <div><span>Contact</span><p>schools@libanglibu.travel<br />+60 5 000 0000</p></div>
             <div><span>Office hours</span><p>Mon–Fri, 9am–6pm MYT<br />Replies within 2 working days</p></div>
-            <div><span>Trip apps</span><p><Link href="/guide">Tour Guide PWA</Link><br /><Link href="/teacher">Teacher PWA</Link></p></div>
+            <div><span>Trip apps</span><p><Link href="/guide">Tour Guide PWA</Link><br /><Link href="/teacher">Teacher PWA</Link><br /><Link href="/email-preview/quotation">Quotation email mockup</Link></p></div>
           </div>
           <p className="copyright">© 2026 Libang Libu Travel — Ipoh School Outing</p>
         </div>

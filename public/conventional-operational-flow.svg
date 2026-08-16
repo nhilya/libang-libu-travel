@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc" style="background:transparent">
+  <title id="title">Conventional School Trip Operational Flow</title>
+  <desc id="desc">Eight-stage manual school trip process from teacher enquiry through quotation, bookings, tour-day coordination and report compilation.</desc>
+  <defs>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="145%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#572e7e" flood-opacity="0.13"/>
+    </filter>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1 1L11 6L1 11Z" fill="#572e7e"/>
+    </marker>
+    <marker id="arrow-pink" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1 1L11 6L1 11Z" fill="#ce307d"/>
+    </marker>
+    <style>
+      .heading{font-family:Arial,sans-serif;font-size:48px;font-weight:800;fill:#572e7e}
+      .subheading{font-family:Arial,sans-serif;font-size:22px;font-weight:400;fill:#75687c}
+      .number{font-family:Arial,sans-serif;font-size:24px;font-weight:800;text-anchor:middle;dominant-baseline:middle}
+      .stage{font-family:Arial,sans-serif;font-size:16px;font-weight:800;letter-spacing:1.5px;fill:#ce307d}
+      .stage-blue{fill:#4898d1}.stage-purple{fill:#572e7e}
+      .card-title{font-family:Arial,sans-serif;font-size:28px;font-weight:800;fill:#572e7e}
+      .copy{font-family:Arial,sans-serif;font-size:18px;font-weight:400;fill:#65596c}
+      .arrow{fill:none;stroke:#572e7e;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow-purple)}
+      .revision{fill:none;stroke:#ce307d;stroke-width:4;stroke-linecap:round;stroke-dasharray:10 10;marker-end:url(#arrow-pink)}
+      .legend{font-family:Arial,sans-serif;font-size:18px;font-weight:700;fill:#572e7e}
+      .note{font-family:Arial,sans-serif;font-size:19px;font-weight:600;fill:#75687c}
+    </style>
+  </defs>
+
+  <!-- Transparent canvas for direct use in presentation slides. -->
+  <text class="heading" x="70" y="78">Conventional School Trip Operational Flow</text>
+  <text class="subheading" x="70" y="116">Manual coordination across calls, messages, documents and spreadsheets</text>
+
+  <!-- Flow connectors -->
+  <path class="arrow" d="M470 285H515"/>
+  <path class="arrow" d="M925 285H970"/>
+  <path class="arrow" d="M1380 285H1425"/>
+  <path class="arrow" d="M1635 390V635"/>
+  <path class="arrow" d="M1425 745H1380"/>
+  <path class="arrow" d="M970 745H925"/>
+  <path class="arrow" d="M515 745H470"/>
+  <path class="revision" d="M1175 180C1175 125 725 125 725 180"/>
+  <text x="950" y="144" text-anchor="middle" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;fill:#ce307d">Repeated calls, follow-ups and document revisions</text>
+
+  <!-- 1 Enquiry -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="190" width="400" height="200" rx="28" fill="#ffffff" stroke="#ce307d" stroke-width="3"/>
+    <rect x="70" y="190" width="12" height="200" rx="6" fill="#ce307d"/>
+  </g>
+  <circle cx="120" cy="235" r="24" fill="#ce307d"/>
+  <text class="number" x="120" y="236" fill="#ffffff">1</text>
+  <text class="stage" x="160" y="241">INITIAL ENQUIRY</text>
+  <text class="card-title" x="104" y="294">Calls and WhatsApp</text>
+  <text class="copy" x="104" y="332">Teacher contacts the travel team</text>
+  <text class="copy" x="104" y="360">Details arrive in separate messages</text>
+
+  <!-- 2 Requirement collection -->
+  <g filter="url(#shadow)">
+    <rect x="525" y="190" width="400" height="200" rx="28" fill="#ffffff" stroke="#ce307d" stroke-width="3"/>
+    <rect x="525" y="190" width="12" height="200" rx="6" fill="#ce307d"/>
+  </g>
+  <circle cx="575" cy="235" r="24" fill="#ce307d"/>
+  <text class="number" x="575" y="236" fill="#ffffff">2</text>
+  <text class="stage" x="615" y="241">MANUAL CAPTURE</text>
+  <text class="card-title" x="559" y="294">Collect requirements</text>
+  <text class="copy" x="559" y="332">Staff asks for dates, budget and needs</text>
+  <text class="copy" x="559" y="360">Information copied into spreadsheets</text>
+
+  <!-- 3 Proposal preparation -->
+  <g filter="url(#shadow)">
+    <rect x="980" y="190" width="400" height="200" rx="28" fill="#fff8dc" stroke="#eec445" stroke-width="3"/>
+    <rect x="980" y="190" width="12" height="200" rx="6" fill="#eec445"/>
+  </g>
+  <circle cx="1030" cy="235" r="24" fill="#eec445"/>
+  <text class="number" x="1030" y="236" fill="#572e7e">3</text>
+  <text class="stage stage-purple" x="1070" y="241">MANUAL PLANNING</text>
+  <text class="card-title" x="1014" y="294">Prepare proposal</text>
+  <text class="copy" x="1014" y="332">Research itinerary and call suppliers</text>
+  <text class="copy" x="1014" y="360">Calculate costs and format quotation</text>
+
+  <!-- 4 Review and approval -->
+  <g filter="url(#shadow)">
+    <rect x="1435" y="190" width="400" height="200" rx="28" fill="#fff8dc" stroke="#eec445" stroke-width="3"/>
+    <rect x="1435" y="190" width="12" height="200" rx="6" fill="#eec445"/>
+  </g>
+  <circle cx="1485" cy="235" r="24" fill="#eec445"/>
+  <text class="number" x="1485" y="236" fill="#572e7e">4</text>
+  <text class="stage stage-purple" x="1525" y="241">CLIENT APPROVAL</text>
+  <text class="card-title" x="1469" y="294">Meetings and revisions</text>
+  <text class="copy" x="1469" y="332">Email documents and collect feedback</text>
+  <text class="copy" x="1469" y="360">Confirm by message, signature and bank-in</text>
+
+  <!-- 5 Booking coordination -->
+  <g filter="url(#shadow)">
+    <rect x="1435" y="645" width="400" height="200" rx="28" fill="#edf7fc" stroke="#4898d1" stroke-width="3"/>
+    <rect x="1435" y="645" width="12" height="200" rx="6" fill="#4898d1"/>
+  </g>
+  <circle cx="1485" cy="690" r="24" fill="#4898d1"/>
+  <text class="number" x="1485" y="691" fill="#ffffff">5</text>
+  <text class="stage stage-blue" x="1525" y="696">BOOKINGS</text>
+  <text class="card-title" x="1469" y="749">Separate vendor follow-ups</text>
+  <text class="copy" x="1469" y="787">Call guide, bus, food and hotel vendors</text>
+  <text class="copy" x="1469" y="815">Track confirmations in spreadsheets</text>
+
+  <!-- 6 Readiness checks -->
+  <g filter="url(#shadow)">
+    <rect x="980" y="645" width="400" height="200" rx="28" fill="#fff8dc" stroke="#eec445" stroke-width="3"/>
+    <rect x="980" y="645" width="12" height="200" rx="6" fill="#eec445"/>
+  </g>
+  <circle cx="1030" cy="690" r="24" fill="#eec445"/>
+  <text class="number" x="1030" y="691" fill="#572e7e">6</text>
+  <text class="stage stage-purple" x="1070" y="696">PRE-TOUR CHECKS</text>
+  <text class="card-title" x="1014" y="749">Chase documents</text>
+  <text class="copy" x="1014" y="787">Collect licences, insurance and menus</text>
+  <text class="copy" x="1014" y="815">Staff checks readiness manually</text>
+
+  <!-- 7 Tour-day coordination -->
+  <g filter="url(#shadow)">
+    <rect x="525" y="645" width="400" height="200" rx="28" fill="#edf7fc" stroke="#4898d1" stroke-width="3"/>
+    <rect x="525" y="645" width="12" height="200" rx="6" fill="#4898d1"/>
+  </g>
+  <circle cx="575" cy="690" r="24" fill="#4898d1"/>
+  <text class="number" x="575" y="691" fill="#ffffff">7</text>
+  <text class="stage stage-blue" x="615" y="696">TOUR DAY</text>
+  <text class="card-title" x="559" y="749">WhatsApp coordination</text>
+  <text class="copy" x="559" y="787">Updates depend on calls and photos</text>
+  <text class="copy" x="559" y="815">No shared live location or status view</text>
+
+  <!-- 8 Post-tour -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="645" width="400" height="200" rx="28" fill="#572e7e" stroke="#572e7e" stroke-width="3"/>
+    <rect x="70" y="645" width="12" height="200" rx="6" fill="#ce307d"/>
+  </g>
+  <circle cx="120" cy="690" r="24" fill="#eec445"/>
+  <text class="number" x="120" y="691" fill="#572e7e">8</text>
+  <text x="160" y="696" style="font-family:Arial,sans-serif;font-size:16px;font-weight:800;letter-spacing:1.5px;fill:#eec445">POST-TOUR</text>
+  <text x="104" y="749" style="font-family:Arial,sans-serif;font-size:28px;font-weight:800;fill:#ffffff">Manual closeout</text>
+  <text x="104" y="787" style="font-family:Arial,sans-serif;font-size:18px;fill:#eee5f3">Collect feedback, receipts and incidents</text>
+  <text x="104" y="815" style="font-family:Arial,sans-serif;font-size:18px;fill:#eee5f3">Compile reports from scattered records</text>
+
+  <!-- Legend and operating principle -->
+  <circle cx="78" cy="934" r="9" fill="#ce307d"/>
+  <text class="legend" x="98" y="941">Messages &amp; manual capture</text>
+  <circle cx="375" cy="934" r="9" fill="#eec445"/>
+  <text class="legend" x="395" y="941">Human planning &amp; approval</text>
+  <circle cx="695" cy="934" r="9" fill="#4898d1"/>
+  <text class="legend" x="715" y="941">Spreadsheet &amp; field coordination</text>
+  <text class="note" x="960" y="1010" text-anchor="middle">Repeated data entry · Fragmented handoffs · Limited real-time visibility</text>
+</svg>

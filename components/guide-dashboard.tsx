@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { OperationsHeader } from "@/components/operations-header";
 import { MonitoringChecklist } from "@/components/monitoring-checklist";
+import { DemoBanner } from "@/components/demo-banner";
 import { operationsApi, operationsDemoMode } from "@/lib/operations-api";
 import { formatDateTime, formatTime } from "@/lib/operations-format";
 import { getQueuedLocationBatches, queueLocationBatch, removeQueuedLocationBatch } from "@/lib/offline-location-queue";
@@ -14,12 +15,14 @@ export function GuideDashboard() {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus | null>(null);
   const [gpsState, setGpsState] = useState<GpsState>("idle");
+  const [gpsErrorMessage, setGpsErrorMessage] = useState("");
   const [latestPoint, setLatestPoint] = useState<LocationPoint | null>(null);
   const [queuedCount, setQueuedCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const watchId = useRef<number | null>(null);
+  const hasLocation = useRef(false);
   const sequence = useRef(0);
   const pendingPoints = useRef<LocationPoint[]>([]);
 
@@ -44,9 +47,11 @@ export function GuideDashboard() {
     const initialLoad = window.setTimeout(() => void loadTrip(), 0);
     const refresh = () => void loadTrip();
     window.addEventListener("llt:demo-state", refresh);
+    window.addEventListener("storage", refresh);
     return () => {
       window.clearTimeout(initialLoad);
       window.removeEventListener("llt:demo-state", refresh);
+      window.removeEventListener("storage", refresh);
     };
   }, [loadTrip]);
 
@@ -64,7 +69,6 @@ export function GuideDashboard() {
     }
     const remaining = await getQueuedLocationBatches().catch(() => []);
     setQueuedCount(remaining.length);
-    if (remaining.length === 0 && watchId.current !== null) setGpsState("live");
   }, []);
 
   const flushPoints = useCallback(async () => {
@@ -100,37 +104,72 @@ export function GuideDashboard() {
     };
   }, [flushPoints, replayQueue]);
 
+  function publishPoint(point: LocationPoint) {
+    hasLocation.current = true;
+    pendingPoints.current.push(point);
+    setLatestPoint(point);
+    setGpsErrorMessage("");
+    setGpsState(navigator.onLine ? "live" : "queued");
+    if (sequence.current === 1 || pendingPoints.current.length >= 5) void flushPoints();
+  }
+
+  function pointFromPosition(position: GeolocationPosition): LocationPoint {
+    sequence.current += 1;
+    return {
+      id: crypto.randomUUID(),
+      recordedAt: new Date(position.timestamp).toISOString(),
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracyM: position.coords.accuracy,
+      altitudeM: position.coords.altitude,
+      headingDeg: position.coords.heading,
+      speedMps: position.coords.speed,
+      sequence: sequence.current,
+      source: "browser_geolocation",
+    };
+  }
+
   function startGps() {
     if (!("geolocation" in navigator)) {
       setGpsState("unsupported");
       return;
     }
     setGpsState("requesting");
-    watchId.current = navigator.geolocation.watchPosition(
-      (position) => {
-        sequence.current += 1;
-        const point: LocationPoint = {
-          id: crypto.randomUUID(),
-          recordedAt: new Date(position.timestamp).toISOString(),
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracyM: position.coords.accuracy,
-          altitudeM: position.coords.altitude,
-          headingDeg: position.coords.heading,
-          speedMps: position.coords.speed,
-          sequence: sequence.current,
-          source: "browser_geolocation",
-        };
-        pendingPoints.current.push(point);
-        setLatestPoint(point);
-        setGpsState(navigator.onLine ? "live" : "queued");
-        if (pendingPoints.current.length >= 5) void flushPoints();
-      },
-      (gpsError) => {
-        setGpsState(gpsError.code === gpsError.PERMISSION_DENIED ? "denied" : "error");
-      },
-      { enableHighAccuracy: true, maximumAge: 15_000, timeout: 20_000 },
+    setGpsErrorMessage("");
+    hasLocation.current = false;
+    const receivePosition = (position: GeolocationPosition) => publishPoint(pointFromPosition(position));
+    const receiveError = (gpsError: GeolocationPositionError) => {
+      if (hasLocation.current) return;
+      setGpsErrorMessage(gpsError.message);
+      setGpsState(gpsError.code === gpsError.PERMISSION_DENIED ? "denied" : "error");
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      receivePosition,
+      receiveError,
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 12_000 },
     );
+    watchId.current = navigator.geolocation.watchPosition(
+      receivePosition,
+      receiveError,
+      { enableHighAccuracy: true, maximumAge: 15_000, timeout: 30_000 },
+    );
+  }
+
+  function useDemoLocation() {
+    sequence.current += 1;
+    publishPoint({
+      id: crypto.randomUUID(),
+      recordedAt: new Date().toISOString(),
+      latitude: 4.59748,
+      longitude: 101.09011,
+      accuracyM: 25,
+      altitudeM: null,
+      headingDeg: null,
+      speedMps: 0,
+      sequence: sequence.current,
+      source: "browser_geolocation",
+    });
   }
 
   async function startDuty() {
@@ -189,7 +228,7 @@ export function GuideDashboard() {
     <div className="operations-app">
       <OperationsHeader active="guide" />
       <main className="operations-main">
-        {operationsDemoMode && <div className="demo-banner">Demo data · Connect the monolith URL to use live operations</div>}
+        {operationsDemoMode && <DemoBanner>Demo data · Open Teacher and Admin in separate tabs to test live sync</DemoBanner>}
         {loading ? <LoadingCard /> : !trip ? <EmptyCard /> : <>
           <section className="operations-welcome">
             <div>
@@ -214,9 +253,10 @@ export function GuideDashboard() {
                 <div><dt>Ends</dt><dd>{formatTime(trip.scheduledEndAt)}</dd></div>
               </dl>
               <div className={`tracking-panel tracking-${gpsState}`}>
-                <div><strong>{gpsLabel(gpsState)}</strong><span>{latestPoint ? `Accuracy ±${Math.round(latestPoint.accuracyM)}m` : "Location starts only after consent"}</span></div>
+                <div><strong>{gpsLabel(gpsState)}</strong><span>{latestPoint ? `Accuracy ±${Math.round(latestPoint.accuracyM)}m` : gpsErrorMessage || "Waiting for the device to return coordinates"}</span></div>
                 {queuedCount > 0 && <b>{queuedCount} queued batch{queuedCount === 1 ? "" : "es"}</b>}
               </div>
+              {operationsDemoMode && trip.status === "IN_PROGRESS" && gpsState !== "live" && <button className="demo-location-action" onClick={useDemoLocation}>Use demo Ipoh location</button>}
               {trip.status === "READY" && <button className="button operations-primary-action" disabled={busy} onClick={startDuty}>{busy ? "Starting…" : "Start duty & share GPS"}</button>}
               {trip.status === "IN_PROGRESS" && <button className="button button-danger operations-primary-action" disabled={busy} onClick={endDuty}>{busy ? "Saving…" : "End duty"}</button>}
               {trip.status === "COMPLETED" && <p className="duty-complete">Duty completed. Location sharing has stopped.</p>}
@@ -266,7 +306,7 @@ export function GuideDashboard() {
 function gpsLabel(state: GpsState) {
   return {
     idle: "GPS not started",
-    requesting: "Waiting for GPS permission…",
+    requesting: "Waiting for a GPS fix…",
     live: "Live location active",
     denied: "Location permission denied",
     unsupported: "GPS unavailable on this device",
